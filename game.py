@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_UP
 
-from constants import FPS, HEIGHT, WIDTH
+from constants import FPS, HEIGHT, WIDTH, APPLE_POINTS
 from models import Apple, Direction, Snake
 
 
@@ -26,6 +26,9 @@ class SnakeGame:
 
         self.apple = Apple()
 
+        self.score = 0
+
+
     def initialize(self):
         """Reinicia el juego a su estado inicial"""
         # Instanciar la serpiente y la manzana
@@ -46,6 +49,7 @@ class SnakeGame:
             # Aumentar el tamaño de la serpiente
             self.snake.grow()
             self.snake.increase_speed()
+            self.score += APPLE_POINTS
         # Chequear si la serpiente se golpeó consigo misma
         if self.snake.has_collided():
             self.initialize()
@@ -68,6 +72,14 @@ class SnakeGame:
         # Chequear si la serpiente comió la manzana
         self.check_collisions()
 
+    def show_score_message(self):
+        score_message = f"Score: {self.score}"
+        font = pygame.font.Font("freesansbold.ttf", 32)
+        message = font.render(score_message, True, (255, 255, 255))
+        rect = message.get_rect()
+        rect.center = (self.width * 0.1, self.height * 0.05)
+        self.screen.blit(message, rect)
+
     def render(self):
         """Dibuja el frame actual en pantalla"""
         # Mostrar el fondo
@@ -79,6 +91,7 @@ class SnakeGame:
         # Mostrar la manzana
         self.apple.render(self.screen)
 
+        self.show_score_message()
         # Actualizar la pantalla
         pygame.display.flip()
 

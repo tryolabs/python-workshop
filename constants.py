@@ -10,3 +10,6 @@ WIDTH = 800
 # del ancho en píxeles y las dimensiones de la grilla
 TILE_SIZE = WIDTH // GRID_DIMENSIONS[0]
 HEIGHT = GRID_DIMENSIONS[1] * TILE_SIZE
+
+# Puntaje de cada manzana
+APPLE_POINTS = 10
