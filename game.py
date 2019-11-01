@@ -1,61 +1,8 @@
-from enum import Enum
-
 import pygame
 from pygame.locals import K_DOWN, K_LEFT, K_RIGHT, K_UP
 
-# FPS (Frames Per Second): número de veces que la pantalla se redibuja por segundo
-FPS = 60
-
-# Dimensiones de la pantalla (medida en cudrantes)
-GRID_DIMENSIONS = (20, 15)
-# Ancho de la pantalla
-WIDTH = 800
-
-# El tamaño en píxeles de cada cuadrante y el ancho de la pantalla se calculan a partir
-# del ancho en píxeles y las dimensiones de la grilla
-TILE_SIZE = WIDTH // GRID_DIMENSIONS[0]
-HEIGHT = GRID_DIMENSIONS[1] * TILE_SIZE
-
-
-class Direction(Enum):
-    RIGHT = 0
-    LEFT = 1
-    UP = 2
-    DOWN = 3
-
-
-class Snake:
-    SNAKE_COLOR = (0, 255, 0)
-
-    def __init__(self, initial_position=(0, 0)):
-        self.position = initial_position
-
-    def render(self, screen):
-        pygame.draw.rect(
-            screen,
-            Snake.SNAKE_COLOR,
-            (
-                self.position[0] * TILE_SIZE,
-                self.position[1] * TILE_SIZE,
-                TILE_SIZE,
-                TILE_SIZE,
-            ),
-        )
-
-    def update(self, direction):
-        if direction == Direction.UP:
-            update_vector = (0, -1)
-        elif direction == Direction.DOWN:
-            update_vector = (0, 1)
-        elif direction == Direction.LEFT:
-            update_vector = (-1, 0)
-        else:  # direction == Direction.RIGHT
-            update_vector = (1, 0)
-
-        self.position = (
-            (self.position[0] + update_vector[0]) % GRID_DIMENSIONS[0],
-            (self.position[1] + update_vector[1]) % GRID_DIMENSIONS[1],
-        )
+from constants import FPS, HEIGHT, WIDTH
+from models import Apple, Direction, Snake
 
 
 class SnakeGame:
@@ -77,28 +24,38 @@ class SnakeGame:
 
         self.snake = Snake()
 
+        self.apple = Apple()
+
     def cleanup(self):
         """Función llamada al cerrar el juego"""
         pygame.quit()
 
-    def check_key(self, events, key):
-        for event in events:
-            if event.type == pygame.KEYUP and event.key == key:
-                return True
-        return False
+    def check_collisions(self):
+        """Chequea si la serpiente comió la manzana"""
+        # Chequear si la serpiente se comió la manzana
+        if self.snake.has_eaten_apple(self.apple.position):
+            # Crear una manzana nueva
+            self.apple = Apple()
+
+            # Aumentar el tamaño de la serpiente
+            self.snake.grow()
 
     def update(self, events):
         """Ejecuta la lógica del juego y actualiza la pantalla"""
 
         # Mover la serpiente
-        if self.check_key(events, K_RIGHT):
-            self.snake.update(Direction.RIGHT)
-        elif self.check_key(events, K_LEFT):
-            self.snake.update(Direction.LEFT)
-        elif self.check_key(events, K_UP):
-            self.snake.update(Direction.UP)
-        elif self.check_key(events, K_DOWN):
-            self.snake.update(Direction.DOWN)
+        for event in events:
+            if event.type == pygame.KEYUP and event.key == K_RIGHT:
+                self.snake.update(Direction.RIGHT)
+            elif event.type == pygame.KEYUP and event.key ==  K_LEFT:
+                self.snake.update(Direction.LEFT)
+            elif event.type == pygame.KEYUP and event.key ==  K_UP:
+                self.snake.update(Direction.UP)
+            elif event.type == pygame.KEYUP and event.key == K_DOWN:
+                self.snake.update(Direction.DOWN)
+
+        # Chequear si la serpiente comió la manzana
+        self.check_collisions()
 
     def render(self):
         """Dibuja el frame actual en pantalla"""
@@ -107,6 +64,9 @@ class SnakeGame:
 
         # Mostrar la serpiente
         self.snake.render(self.screen)
+
+        # Mostrar la manzana
+        self.apple.render(self.screen)
 
         # Actualizar la pantalla
         pygame.display.flip()
@@ -134,5 +94,6 @@ class SnakeGame:
 
 
 # Instanciar el juego y comenzar la ejecución
-snake_game = SnakeGame()
-snake_game.execute()
+if __name__ == "__main__":
+    snake_game = SnakeGame()
+    snake_game.execute()
