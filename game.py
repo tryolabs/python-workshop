@@ -45,7 +45,7 @@ class SnakeGame:
 
             # Aumentar el tamaño de la serpiente
             self.snake.grow()
-
+            self.snake.increase_speed()
         # Chequear si la serpiente se golpeó consigo misma
         if self.snake.has_collided():
             self.initialize()

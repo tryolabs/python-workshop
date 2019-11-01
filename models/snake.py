@@ -117,6 +117,10 @@ class Snake:
                 # Una vez que ya crecio (no elimino la cola), vuelve a su estado normal (increase_size = False)
                 self.increase_size = False
 
+
+    def increase_speed(self):
+        self.speed -= self.speed * 0.1
+
     def has_eaten_apple(self, apple_position):
         # Ahora que tiene cuerpo, hay que chequear si la cabeza coincide con la manzana
         return self.body[-1].position == apple_position
