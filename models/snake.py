@@ -45,9 +45,17 @@ class SnakeSegment:
 
 
 class Snake:
-    def __init__(self, initial_position=(2, 0)):
-        self.position = initial_position
+    def __init__(self, initial_position=(2, 0), initial_speed=2):
+        # Cada cuántos segundos debe moverse la serpiente
+        self.speed = initial_speed
 
+        # Reloj brindado por pygame para calcular el tiempo que pasó
+        # desde la última vez que se movió la serpiente
+        self.clock = pygame.time.Clock()
+        # Segundos desde el último movimiento
+        self.time_since_last_move = 0
+
+        self.position = initial_position
         self.current_direction = Direction.RIGHT
 
         self.increase_size = False
@@ -74,33 +82,40 @@ class Snake:
 
     def update(self, direction):
         if Direction.are_opposite(self.current_direction, direction):
-            return
-        self.current_direction = direction
+            direction = None
+        if direction is not None:
+            self.current_direction = direction
+
+
+        self.time_since_last_move += self.clock.tick()
 
         # Obtengo la posicion de la cabeza anterior
         old_head = self.body[-1]
+        self.time_since_last_move += self.clock.tick()
+        
+        if self.time_since_last_move >= self.speed * 1000:
+            self.time_since_last_move = 0 
+            # Calcular la nueva posición de la cabeza de la serpiente
+            new_head_x, new_head_y = old_head.position
+            if self.current_direction == Direction.UP:
+                new_head_y = (new_head_y - 1) % GRID_DIMENSIONS[1]
+            elif self.current_direction == Direction.DOWN:
+                new_head_y = (new_head_y + 1) % GRID_DIMENSIONS[1]
+            elif self.current_direction == Direction.RIGHT:
+                new_head_x = (new_head_x + 1) % GRID_DIMENSIONS[0]
+            else:
+                new_head_x = (new_head_x - 1) % GRID_DIMENSIONS[0]
 
-        # Calcular la nueva posición de la cabeza de la serpiente
-        new_head_x, new_head_y = old_head.position
-        if self.current_direction == Direction.UP:
-            new_head_y = (new_head_y - 1) % GRID_DIMENSIONS[1]
-        elif self.current_direction == Direction.DOWN:
-            new_head_y = (new_head_y + 1) % GRID_DIMENSIONS[1]
-        elif self.current_direction == Direction.RIGHT:
-            new_head_x = (new_head_x + 1) % GRID_DIMENSIONS[0]
-        else:
-            new_head_x = (new_head_x - 1) % GRID_DIMENSIONS[0]
+            # Agregar la nueva cabeza a la lista de segmentos
+            self.body.append(SnakeSegment((new_head_x, new_head_y), self.current_direction))
 
-        # Agregar la nueva cabeza a la lista de segmentos
-        self.body.append(SnakeSegment((new_head_x, new_head_y), self.current_direction))
-
-        # Solo remuevo la antigua cola si la serpiente no crecio
-        if not self.increase_size:
-            # Remover la antigua cola de la serpiente
-            self.body.pop(0)
-        else:
-            # Una vez que ya crecio (no elimino la cola), vuelve a su estado normal (increase_size = False)
-            self.increase_size = False
+            # Solo remuevo la antigua cola si la serpiente no crecio
+            if not self.increase_size:
+                # Remover la antigua cola de la serpiente
+                self.body.pop(0)
+            else:
+                # Una vez que ya crecio (no elimino la cola), vuelve a su estado normal (increase_size = False)
+                self.increase_size = False
 
     def has_eaten_apple(self, apple_position):
         # Ahora que tiene cuerpo, hay que chequear si la cabeza coincide con la manzana

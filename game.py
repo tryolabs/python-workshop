@@ -52,18 +52,19 @@ class SnakeGame:
 
     def update(self, events):
         """Ejecuta la lógica del juego y actualiza la pantalla"""
-
+        direction = None
         # Mover la serpiente
         for event in events:
             if event.type == pygame.KEYUP and event.key == K_RIGHT:
-                self.snake.update(Direction.RIGHT)
+                direction = Direction.RIGHT
             elif event.type == pygame.KEYUP and event.key == K_LEFT:
-                self.snake.update(Direction.LEFT)
+                direction = Direction.LEFT
             elif event.type == pygame.KEYUP and event.key == K_UP:
-                self.snake.update(Direction.UP)
+                direction = Direction.UP
             elif event.type == pygame.KEYUP and event.key == K_DOWN:
-                self.snake.update(Direction.DOWN)
+                direction = Direction.DOWN
 
+        self.snake.update(direction)
         # Chequear si la serpiente comió la manzana
         self.check_collisions()
 
