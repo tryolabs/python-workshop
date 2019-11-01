@@ -105,3 +105,7 @@ class Snake:
     def has_eaten_apple(self, apple_position):
         # Ahora que tiene cuerpo, hay que chequear si la cabeza coincide con la manzana
         return self.body[-1].position == apple_position
+
+    def has_collided(self):
+        all_positions = [segment.position for segment in self.body]
+        return all_positions[-1] in all_positions[:-1]

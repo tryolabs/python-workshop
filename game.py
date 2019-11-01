@@ -26,6 +26,12 @@ class SnakeGame:
 
         self.apple = Apple()
 
+    def initialize(self):
+        """Reinicia el juego a su estado inicial"""
+        # Instanciar la serpiente y la manzana
+        self.snake = Snake()
+        self.apple = Apple()
+
     def cleanup(self):
         """Función llamada al cerrar el juego"""
         pygame.quit()
@@ -40,6 +46,10 @@ class SnakeGame:
             # Aumentar el tamaño de la serpiente
             self.snake.grow()
 
+        # Chequear si la serpiente se golpeó consigo misma
+        if self.snake.has_collided():
+            self.initialize()
+
     def update(self, events):
         """Ejecuta la lógica del juego y actualiza la pantalla"""
 
@@ -47,9 +57,9 @@ class SnakeGame:
         for event in events:
             if event.type == pygame.KEYUP and event.key == K_RIGHT:
                 self.snake.update(Direction.RIGHT)
-            elif event.type == pygame.KEYUP and event.key ==  K_LEFT:
+            elif event.type == pygame.KEYUP and event.key == K_LEFT:
                 self.snake.update(Direction.LEFT)
-            elif event.type == pygame.KEYUP and event.key ==  K_UP:
+            elif event.type == pygame.KEYUP and event.key == K_UP:
                 self.snake.update(Direction.UP)
             elif event.type == pygame.KEYUP and event.key == K_DOWN:
                 self.snake.update(Direction.DOWN)
